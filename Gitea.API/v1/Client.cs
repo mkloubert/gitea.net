@@ -21,10 +21,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 
 using Gitea.API.v1.Users;
+using Newtonsoft.Json;
 using System;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Threading.Tasks;
 
 namespace Gitea.API.v1
 {
@@ -145,6 +147,26 @@ namespace Gitea.API.v1
         /// <inheritdoc />
         public void Dispose()
         { }
+
+        /// <summary>
+        /// Gets the Gitea version.
+        /// </summary>
+        /// <returns>The version.</returns>
+        public async Task<GiteaVersion> GetVersion()
+        {
+            using (var rest = CreateBaseClient())
+            {
+                var resp = await rest.GetAsync("version");
+
+                var version = JsonConvert.DeserializeObject<GiteaVersion>
+                    (
+                        await resp.Content.ReadAsStringAsync()
+                    );
+                version.Client = this;
+
+                return version;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the factory for HTTP message handler.

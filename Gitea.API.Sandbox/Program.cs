@@ -64,17 +64,34 @@ namespace Gitea.API.Sandbox
             using (var client = new Client(username: Credentials.User, password: Credentials.Password,
                                            host: Credentials.Host, port: Credentials.Port, isSecure: Credentials.IsSecure))
             {
-                /*
-                var newUser = await client.Users.New()
+                var version = await client.GetVersion();
+                if (version != null)
+                {
+
+                }
+
+                /* var newUser = await client.Users.New()
                     .Email("marcel.kloubert@gmx.net")
                     .UserName("kloubi")
                     .Password("P@assword123!")
                     .FullName("Houbi The Kloubi")
                     .SendNotification()
-                    .Create(); */
+                    .Create();
 
-                // var kloubi = await client.Users.GetByUsername("kloubi");
-                // await kloubi.Delete();
+                
+                var kloubi = await client.Users.GetByUsername("kloubi");
+                kloubi = await kloubi.Update()
+                    .Email("marcel.kloubert@gmx.net")
+                    .Password("A_New_P@ssword_123 !")
+                    .FullName("The Kloubi")
+                    .IsActive(false)
+                    .MakeAdmin()
+                    .Location("Aachen")
+                    .NoRepositoryCreationLimit()
+                    .Save();
+
+                await kloubi.Delete();
+                */
 
                 var user = await client.Users.GetCurrent();
                 if (user != null)

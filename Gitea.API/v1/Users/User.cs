@@ -208,5 +208,14 @@ namespace Gitea.API.v1.Users
                 return followers;
             }
         }
+
+        /// <summary>
+        /// Starts updating that user.
+        /// </summary>
+        /// <returns>The updater.</returns>
+        public UserUpdater Update()
+        {
+            return new UserUpdater(this);
+        }
     }
 }

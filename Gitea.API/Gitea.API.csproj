@@ -54,6 +54,7 @@
     <Compile Include="v1\Client.cs" />
     <Compile Include="v1\DummyAuthorizer.cs" />
     <Compile Include="v1\EndpointBase.cs" />
+    <Compile Include="v1\GiteaVersion.cs" />
     <Compile Include="v1\IAuthorizer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="v1\Repositories\Repository.cs" />
@@ -64,6 +65,7 @@
     <Compile Include="v1\Users\User.cs" />
     <Compile Include="v1\Users\UserBuilder.cs" />
     <Compile Include="v1\Users\UsersEndpoint.cs" />
+    <Compile Include="v1\Users\UserUpdater.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

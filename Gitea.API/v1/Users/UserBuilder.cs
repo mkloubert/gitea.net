@@ -48,6 +48,10 @@ namespace Gitea.API.v1.Users
             _properties["send_notify"] = false;
         }
 
+        /// <summary>
+        /// Creates a new user.
+        /// </summary>
+        /// <returns>The new user.</returns>
         public async Task<User> Create()
         {
             using (var rest = Endpoint.Client.CreateBaseClient())
@@ -90,10 +94,7 @@ namespace Gitea.API.v1.Users
                         await resp.Content.ReadAsStringAsync()
                     );
 
-                if (newUser != null)
-                {
-                    newUser.Endpoint = Endpoint;
-                }
+                Endpoint.SetupUser(newUser);
 
                 return newUser;
             }
@@ -109,7 +110,7 @@ namespace Gitea.API.v1.Users
         /// <summary>
         /// Sets the email address.
         /// </summary>
-        /// <param name="full_name">The email address.</param>
+        /// <param name="email">The email address.</param>
         /// <returns>That instance.</returns>
         public UserBuilder Email(string email)
         {
