@@ -21,35 +21,28 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 
 using Newtonsoft.Json;
-using System.IO;
+using System.Runtime.Serialization;
 
-namespace Gitea.API
+namespace Gitea.API.v1
 {
     /// <summary>
-    /// A basic JSON entity.
+    /// An API error.
     /// </summary>
-    public abstract class JsonEntityBase
+    [DataContract]
+    public class ApiError
     {
-        /// <inheritdoc />
-        public override string ToString()
-        {
-            using (var writer = new StringWriter())
-            {
-                using (var jsonWriter = new JsonTextWriter(writer))
-                {
-                    jsonWriter.Indentation = 2;
-                    jsonWriter.IndentChar = ' ';
-                    jsonWriter.Formatting = Formatting.Indented;
+        /// <summary>
+        /// message
+        /// </summary>
+        [DataMember]
+        [JsonProperty("message")]
+        public string Message { get; set; }
 
-                    var serializer = JsonSerializer.Create();
-                    serializer.Serialize(jsonWriter, this);
-
-                    jsonWriter.Flush();
-                    writer.Flush();
-
-                    return writer.ToString();
-                }
-            }
-        }
+        /// <summary>
+        /// url
+        /// </summary>
+        [DataMember]
+        [JsonProperty("url")]
+        public string Url { get; set; }
     }
 }

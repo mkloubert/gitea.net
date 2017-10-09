@@ -22,7 +22,9 @@
 
 using Gitea.API.v1.Repositories;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -59,6 +61,34 @@ namespace Gitea.API.v1.Users
             {
                 var resp = await rest.GetAsync("users/" + HttpUtility.UrlEncode(User.Username) + "/repos");
 
+                Exception exception = null;
+
+                if (resp.StatusCode != HttpStatusCode.OK)
+                {
+                    switch (resp.StatusCode)
+                    {
+                        case HttpStatusCode.InternalServerError:
+                            exception = new ApiException(JsonConvert.DeserializeObject<ApiError>
+                                (
+                                    await resp.Content.ReadAsStringAsync()
+                                ),
+                                (int)resp.StatusCode, resp.ReasonPhrase);
+                            break;
+
+                        default:
+                            exception = new UnexpectedResponseException((int)resp.StatusCode,
+                                                                        resp.ReasonPhrase);
+                            break;
+                    }
+                }
+
+                if (exception != null)
+                {
+                    throw exception;
+                }
+
+                var json = await resp.Content.ReadAsStringAsync();
+
                 var repoList = JsonConvert.DeserializeObject<IEnumerable<Repository>>
                     (
                         await resp.Content.ReadAsStringAsync()
@@ -69,7 +99,10 @@ namespace Gitea.API.v1.Users
                 {
                     while (e.MoveNext())
                     {
-                        userRepos.Add(e.Current);
+                        var r = e.Current;
+                        r.Owner.Endpoint = User.Endpoint;
+
+                        userRepos.Add(r);
                     }
                 }
 

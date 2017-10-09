@@ -20,36 +20,61 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 
-using Newtonsoft.Json;
-using System.IO;
+using System;
 
-namespace Gitea.API
+namespace Gitea.API.v1
 {
     /// <summary>
-    /// A basic JSON entity.
+    /// An API exception.
     /// </summary>
-    public abstract class JsonEntityBase
+    public class ApiException : Exception
     {
-        /// <inheritdoc />
-        public override string ToString()
+        /// <summary>
+        /// Initializes a new instance of that class.
+        /// </summary>
+        /// <param name="error">The underlying error.</param>
+        /// <param name="code">The HTTP response code.</param>
+        /// <param name="status">The HTTP status text.</param>
+        public ApiException(ApiError error = null,
+                            int? code = 500, string status = null)
         {
-            using (var writer = new StringWriter())
-            {
-                using (var jsonWriter = new JsonTextWriter(writer))
-                {
-                    jsonWriter.Indentation = 2;
-                    jsonWriter.IndentChar = ' ';
-                    jsonWriter.Formatting = Formatting.Indented;
+            Error = error;
 
-                    var serializer = JsonSerializer.Create();
-                    serializer.Serialize(jsonWriter, this);
+            Code = code;
+            Status = status;
+        }
 
-                    jsonWriter.Flush();
-                    writer.Flush();
+        /// <summary>
+        /// Gets the HTTP response code.
+        /// </summary>
+        public int? Code
+        {
+            get;
+            protected set;
+        }
 
-                    return writer.ToString();
-                }
-            }
+        /// <summary>
+        /// Gets the underlying error.
+        /// </summary>
+        public ApiError Error
+        {
+            get;
+            protected set;
+        }
+
+        /// <inheritdoc />
+        public override string Message
+        {
+            get { return Error?.Message; }
+        }
+
+        /// <summary>
+        /// Gets the HTTP status text.
+        /// </summary>
+        public string Status
+        {
+            get;
+            protected set;
         }
     }
 }

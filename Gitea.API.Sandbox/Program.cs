@@ -67,9 +67,17 @@ namespace Gitea.API.Sandbox
                 var user = await client.Users.GetCurrent();
                 if (user != null)
                 {
-                    var repos = await user.Repositories.GetAll();
-                    if (repos != null)
+                    using (var migrate = user.Migrate())
                     {
+                        var newRepo = await migrate.CloneFrom("https://github.com/mkloubert/gitea.net")
+                                                   .Description("A test migration from GitHub")
+                                                   .Name("Gitea.NET")
+                                                   .Start();
+
+                        if (newRepo != null)
+                        {
+
+                        }
                     }
                 }
             }

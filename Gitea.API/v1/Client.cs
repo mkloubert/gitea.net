@@ -117,7 +117,24 @@ namespace Gitea.API.v1
         /// <returns>The new instance.</returns>
         public HttpClient CreateBaseClient()
         {
-            var newClient = new HttpClient();
+            var msgHandlerFactory = MessageHandlerFactory;
+
+            HttpMessageHandler msgHandler = null;
+            if (msgHandlerFactory != null)
+            {
+                msgHandler = msgHandlerFactory(this);
+            }
+
+            HttpClient newClient;
+            if (msgHandler == null)
+            {
+                newClient = new HttpClient();
+            }
+            else
+            {
+                newClient = new HttpClient(msgHandler);  // use custom handler
+            }
+
             newClient.BaseAddress = BaseUrl;
             newClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             Authorizer.PrepareClient(newClient);
@@ -128,6 +145,11 @@ namespace Gitea.API.v1
         /// <inheritdoc />
         public void Dispose()
         { }
+
+        /// <summary>
+        /// Gets or sets the factory for HTTP message handler.
+        /// </summary>
+        public Func<Client, HttpMessageHandler> MessageHandlerFactory { get; set; }
 
         /// <summary>
         /// Sets up the base URL.
@@ -160,6 +182,11 @@ namespace Gitea.API.v1
         {
             Users = new UsersEndpoint(this);
         }
+
+        /// <summary>
+        /// Gets or sets a value or object that should be linked with that instance.
+        /// </summary>
+        public object Tag { get; set; }
 
         /// <summary>
         /// Gets the endpoint of users.

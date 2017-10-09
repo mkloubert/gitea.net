@@ -21,35 +21,40 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 
 using Newtonsoft.Json;
-using System.IO;
+using System.Runtime.Serialization;
 
-namespace Gitea.API
+namespace Gitea.API.v1.Repositories
 {
     /// <summary>
-    /// A basic JSON entity.
+    /// Permissions of a repository.
     /// </summary>
-    public abstract class JsonEntityBase
+    [DataContract]
+    public class RepositoryPermissions : JsonEntityBase
     {
-        /// <inheritdoc />
-        public override string ToString()
-        {
-            using (var writer = new StringWriter())
-            {
-                using (var jsonWriter = new JsonTextWriter(writer))
-                {
-                    jsonWriter.Indentation = 2;
-                    jsonWriter.IndentChar = ' ';
-                    jsonWriter.Formatting = Formatting.Indented;
+        /// <summary>
+        /// admin
+        /// </summary>
+        [DataMember]
+        [JsonProperty("admin")]
+        public bool CanAdministrate { get; set; }
 
-                    var serializer = JsonSerializer.Create();
-                    serializer.Serialize(jsonWriter, this);
+        /// <summary>
+        /// pull
+        /// </summary>
+        [DataMember]
+        [JsonProperty("pull")]
+        public bool CanPull { get; set; }
 
-                    jsonWriter.Flush();
-                    writer.Flush();
+        /// <summary>
+        /// push
+        /// </summary>
+        [DataMember]
+        [JsonProperty("push")]
+        public bool CanPush { get; set; }
 
-                    return writer.ToString();
-                }
-            }
-        }
+        /// <summary>
+        /// Gets the underlying repository.
+        /// </summary>
+        public Repository Repository { get; internal set; }
     }
 }

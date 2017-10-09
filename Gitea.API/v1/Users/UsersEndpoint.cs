@@ -21,6 +21,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 
 using Newtonsoft.Json;
+using System;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace Gitea.API.v1.Users
@@ -43,6 +45,37 @@ namespace Gitea.API.v1.Users
             using (var rest = Client.CreateBaseClient())
             {
                 var resp = await rest.GetAsync("user");
+
+                Exception exception = null;
+
+                if (resp.StatusCode != HttpStatusCode.OK)
+                {
+                    switch (resp.StatusCode)
+                    {
+                        case HttpStatusCode.NotFound:
+                            exception = new ApiException(null,
+                                                         (int)resp.StatusCode, resp.ReasonPhrase);
+                            break;
+
+                        case HttpStatusCode.InternalServerError:
+                            exception = new ApiException(JsonConvert.DeserializeObject<ApiError>
+                                (
+                                    await resp.Content.ReadAsStringAsync()
+                                ),
+                                (int)resp.StatusCode, resp.ReasonPhrase);
+                            break;
+
+                        default:
+                            exception = new UnexpectedResponseException((int)resp.StatusCode,
+                                                                        resp.ReasonPhrase);
+                            break;
+                    }
+                }
+
+                if (exception != null)
+                {
+                    throw exception;
+                }
 
                 var user = JsonConvert.DeserializeObject<User>
                     (

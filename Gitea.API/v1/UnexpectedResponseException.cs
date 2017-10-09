@@ -20,36 +20,48 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 
-using Newtonsoft.Json;
-using System.IO;
+using System;
 
-namespace Gitea.API
+namespace Gitea.API.v1
 {
     /// <summary>
-    /// A basic JSON entity.
+    /// An exception for an unexpected API response.
     /// </summary>
-    public abstract class JsonEntityBase
+    public class UnexpectedResponseException : Exception
     {
-        /// <inheritdoc />
-        public override string ToString()
+        /// <summary>
+        /// Initializes a new instance of that class.
+        /// </summary>
+        /// <param name="code">The HTTP response code.</param>
+        /// <param name="status">The HTTP status text.</param>
+        public UnexpectedResponseException(int? code = 500, string status = null)
         {
-            using (var writer = new StringWriter())
-            {
-                using (var jsonWriter = new JsonTextWriter(writer))
-                {
-                    jsonWriter.Indentation = 2;
-                    jsonWriter.IndentChar = ' ';
-                    jsonWriter.Formatting = Formatting.Indented;
+            Code = code;
+            Status = status;
+        }
 
-                    var serializer = JsonSerializer.Create();
-                    serializer.Serialize(jsonWriter, this);
+        /// <summary>
+        /// Gets the HTTP response code.
+        /// </summary>
+        public int? Code
+        {
+            get;
+            protected set;
+        }
 
-                    jsonWriter.Flush();
-                    writer.Flush();
+        /// <inheritdoc />
+        public override string Message
+        {
+            get { return string.Format("Unexpected response: [{0}] '{1}'"); }
+        }
 
-                    return writer.ToString();
-                }
-            }
+        /// <summary>
+        /// Gets the HTTP status text.
+        /// </summary>
+        public string Status
+        {
+            get;
+            protected set;
         }
     }
 }
