@@ -20,9 +20,10 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 
-using Gitea.API.v1.Repositories;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using System.Web;
@@ -49,6 +50,51 @@ namespace Gitea.API.v1.Users
         [DataMember]
         [JsonProperty("avatar_url")]
         public string AvatarUrl { get; set; }
+
+        /// <summary>
+        /// Deletes that user.
+        /// </summary>
+        public async Task Delete()
+        {
+            var current = await Endpoint.GetCurrent();
+            if (current.ID == ID)
+            {
+                throw new InvalidOperationException();  // cannot kill yourself ;-)
+            }
+
+            using (var rest = Endpoint.Client.CreateBaseClient())
+            {
+                var resp = await rest.DeleteAsync("admin/users/" + HttpUtility.UrlEncode(Username));
+
+                Exception exception = null;
+
+                if (resp.StatusCode != HttpStatusCode.NoContent)
+                {
+                    switch ((int)resp.StatusCode)
+                    {
+                        case 403:
+                        case 422:
+                        case 500:
+                            exception = new ApiException(JsonConvert.DeserializeObject<ApiError>
+                                (
+                                    await resp.Content.ReadAsStringAsync()
+                                ),
+                                (int)resp.StatusCode, resp.ReasonPhrase);
+                            break;
+
+                        default:
+                            exception = new UnexpectedResponseException((int)resp.StatusCode,
+                                                                        resp.ReasonPhrase);
+                            break;
+                    }
+                }
+
+                if (exception != null)
+                {
+                    throw exception;
+                }
+            }
+        }
 
         /// <summary>
         /// email
@@ -116,6 +162,32 @@ namespace Gitea.API.v1.Users
             {
                 var resp = await rest.GetAsync("users/" + HttpUtility.UrlEncode(Username) + "/followers");
 
+                Exception exception = null;
+
+                if (resp.StatusCode != HttpStatusCode.OK)
+                {
+                    switch ((int)resp.StatusCode)
+                    {
+                        case 500:
+                            exception = new ApiException(JsonConvert.DeserializeObject<ApiError>
+                                (
+                                    await resp.Content.ReadAsStringAsync()
+                                ),
+                                (int)resp.StatusCode, resp.ReasonPhrase);
+                            break;
+
+                        default:
+                            exception = new UnexpectedResponseException((int)resp.StatusCode,
+                                                                        resp.ReasonPhrase);
+                            break;
+                    }
+                }
+
+                if (exception != null)
+                {
+                    throw exception;
+                }
+
                 var users = JsonConvert.DeserializeObject<IEnumerable<User>>
                     (
                         await resp.Content.ReadAsStringAsync()
@@ -126,21 +198,15 @@ namespace Gitea.API.v1.Users
                 {
                     while (e.MoveNext())
                     {
-                        followers.Add(e.Current);
+                        var f = e.Current;
+                        Endpoint.SetupUser(f);
+
+                        followers.Add(f);
                     }
                 }
 
                 return followers;
             }
-        }
-
-        /// <summary>
-        /// Starts migrating an external repository.
-        /// </summary>
-        /// <returns>The builder.</returns>
-        public MigrationBuilder Migrate()
-        {
-            return new MigrationBuilder(this);
         }
     }
 }

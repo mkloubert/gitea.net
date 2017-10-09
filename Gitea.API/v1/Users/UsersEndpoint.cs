@@ -23,7 +23,9 @@
 using Newtonsoft.Json;
 using System;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace Gitea.API.v1.Users
 {
@@ -37,15 +39,16 @@ namespace Gitea.API.v1.Users
         { }
 
         /// <summary>
-        /// Returns the current user.
+        /// Creates an user object from a HTTP response.
         /// </summary>
-        /// <returns>The current user.</returns>
-        public async Task<User> GetCurrent()
+        /// <param name="resp">The response.</param>
+        /// <returns>The created object.</returns>
+        protected virtual async Task<User> CreateUserObject(HttpResponseMessage resp)
         {
-            using (var rest = Client.CreateBaseClient())
-            {
-                var resp = await rest.GetAsync("user");
+            User user = null;
 
+            if (resp != null)
+            {
                 Exception exception = null;
 
                 if (resp.StatusCode != HttpStatusCode.OK)
@@ -77,17 +80,75 @@ namespace Gitea.API.v1.Users
                     throw exception;
                 }
 
-                var user = JsonConvert.DeserializeObject<User>
+                user = JsonConvert.DeserializeObject<User>
                     (
                         await resp.Content.ReadAsStringAsync()
                     );
+            }
 
-                if (user != null)
+            SetupUser(user);
+
+            return user;
+        }
+
+        /// <summary>
+        /// Returns the current user.
+        /// </summary>
+        /// <returns>The current user.</returns>
+        public async Task<User> GetCurrent()
+        {
+            using (var rest = Client.CreateBaseClient())
+            {
+                var resp = await rest.GetAsync("user");
+
+                return await CreateUserObject(resp);
+            }
+        }
+
+        /// <summary>
+        /// Returns a user by name.
+        /// </summary>
+        /// <param name="username">The user name.</param>
+        /// <returns>The user.</returns>
+        public async Task<User> GetByUsername(string username)
+        {
+            using (var rest = Client.CreateBaseClient())
+            {
+                var resp = await rest.GetAsync("users/" + HttpUtility.UrlEncode(username));
+
+                return await CreateUserObject(resp);
+            }
+        }
+
+        /// <summary>
+        /// Starts creating a new user.
+        /// </summary>
+        /// <returns>The builder.</returns>
+        public UserBuilder New()
+        {
+            return new UserBuilder(this);
+        }
+
+        /// <summary>
+        /// Sets up an user object for that endpoint.
+        /// </summary>
+        /// <param name="user">The user object.</param>
+        /// <exception cref="ArgumentException">Setup failed.</exception>
+        public void SetupUser(User user)
+        {
+            if (user != null)
+            {
+                if (!Equals(user.Endpoint, this))
                 {
-                    user.Endpoint = this;
+                    if (user.Endpoint == null)
+                    {
+                        user.Endpoint = this;
+                    }
+                    else
+                    {
+                        throw new ArgumentException(nameof(user));
+                    }
                 }
-
-                return user;
             }
         }
     }

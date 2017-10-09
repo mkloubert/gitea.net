@@ -64,13 +64,25 @@ namespace Gitea.API.Sandbox
             using (var client = new Client(username: Credentials.User, password: Credentials.Password,
                                            host: Credentials.Host, port: Credentials.Port, isSecure: Credentials.IsSecure))
             {
+                /*
+                var newUser = await client.Users.New()
+                    .Email("marcel.kloubert@gmx.net")
+                    .UserName("kloubi")
+                    .Password("P@assword123!")
+                    .FullName("Houbi The Kloubi")
+                    .SendNotification()
+                    .Create(); */
+
+                // var kloubi = await client.Users.GetByUsername("kloubi");
+                // await kloubi.Delete();
+
                 var user = await client.Users.GetCurrent();
                 if (user != null)
                 {
-                    using (var migrate = user.Migrate())
+                    using (var migrate = user.Repositories.Migrate())
                     {
                         var newRepo = await migrate.CloneFrom("https://github.com/mkloubert/gitea.net")
-                                                   .Description("A test migration from GitHub")
+                                                   .Description(".NET Library for the Gitea API.")
                                                    .Name("Gitea.NET")
                                                    .Start();
 

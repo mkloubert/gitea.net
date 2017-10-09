@@ -59,9 +59,10 @@
     <Compile Include="v1\Repositories\Repository.cs" />
     <Compile Include="v1\Repositories\RepositoryPermissions.cs" />
     <Compile Include="v1\UnexpectedResponseException.cs" />
-    <Compile Include="v1\Repositories\MigrationBuilder.cs" />
+    <Compile Include="v1\Users\MigrationBuilder.cs" />
     <Compile Include="v1\Users\RepositoriesEndpoint.cs" />
     <Compile Include="v1\Users\User.cs" />
+    <Compile Include="v1\Users\UserBuilder.cs" />
     <Compile Include="v1\Users\UsersEndpoint.cs" />
   </ItemGroup>
   <ItemGroup>

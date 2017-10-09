@@ -111,6 +111,15 @@ namespace Gitea.API.v1.Users
         }
 
         /// <summary>
+        /// Starts migrating an external repository.
+        /// </summary>
+        /// <returns>The builder.</returns>
+        public MigrationBuilder Migrate()
+        {
+            return new MigrationBuilder(User);
+        }
+
+        /// <summary>
         /// Gets the underlying user.
         /// </summary>
         public User User { get; internal protected set; }

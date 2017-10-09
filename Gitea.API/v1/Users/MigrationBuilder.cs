@@ -20,7 +20,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 
-using Gitea.API.v1.Users;
+using Gitea.API.v1.Repositories;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -29,7 +29,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Gitea.API.v1.Repositories
+namespace Gitea.API.v1.Users
 {
     /// <summary>
     /// A builder class for migrating an external repository for an user.
@@ -63,6 +63,18 @@ namespace Gitea.API.v1.Repositories
         }
 
         /// <summary>
+        /// Sets the clone address of the source repository.
+        /// </summary>
+        /// <param name="clone_addr">The clone address of the source repository.</param>
+        /// <returns>That instance.</returns>
+        public MigrationBuilder CloneFrom(string clone_addr)
+        {
+            _properties["clone_addr"] = clone_addr;
+
+            return this;
+        }
+
+        /// <summary>
         /// Sets the description for the repository in Gitea.
         /// </summary>
         /// <param name="description">The description.</param>
@@ -79,18 +91,6 @@ namespace Gitea.API.v1.Repositories
         {
             _properties?.Clear();
             _properties = null;
-        }
-
-        /// <summary>
-        /// Sets the clone address of the source repository.
-        /// </summary>
-        /// <param name="clone_addr">The clone address of the source repository.</param>
-        /// <returns>That instance.</returns>
-        public MigrationBuilder CloneFrom(string clone_addr)
-        {
-            _properties["clone_addr"] = clone_addr;
-
-            return this;
         }
 
         /// <summary>
@@ -149,8 +149,11 @@ namespace Gitea.API.v1.Repositories
                     {
                         case 422:
                         case 500:
-                            exception = new ApiException(null,
-                                                         (int)resp.StatusCode, resp.ReasonPhrase);
+                            exception = new ApiException(JsonConvert.DeserializeObject<ApiError>
+                                (
+                                    await resp.Content.ReadAsStringAsync()
+                                ),
+                                (int)resp.StatusCode, resp.ReasonPhrase);
                             break;
 
                         default:
