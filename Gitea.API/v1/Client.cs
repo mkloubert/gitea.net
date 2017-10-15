@@ -25,6 +25,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Gitea.API.v1.Users;
 using Newtonsoft.Json;
 
 namespace Gitea.API.v1 {
@@ -119,9 +120,8 @@ namespace Gitea.API.v1 {
         /// Gets the Gitea version.
         /// </summary>
         /// <returns>The version.</returns>
-        public async Task<GiteaVersion> GetVersion() {
-            using (var rest = CreateBaseClient())
-            {
+        public async Task<GiteaVersion> GetVersionAsync() {
+            using (var rest = CreateBaseClient()) {
                 var resp = await rest.GetAsync("version");
 
                 var version = JsonConvert.DeserializeObject<GiteaVersion>
@@ -164,6 +164,12 @@ namespace Gitea.API.v1 {
         /// Sets up the endpoints.
         /// </summary>
         protected virtual void SetupEndpoints() {
+            Users = new UserEndpoint(this);
         }
+
+        /// <summary>
+        /// Gets the endpoint for accessing user resources.
+        /// </summary>
+        public UserEndpoint Users { get; protected set; }
     }
 }

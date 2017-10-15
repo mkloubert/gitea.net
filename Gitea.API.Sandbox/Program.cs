@@ -24,8 +24,8 @@ namespace Gitea.API.Sandbox {
 
             using (var client = new Client(auth,
                                            Credentials.Host, Credentials.Port, Credentials.IsSecure)) {
-                var version = await client.GetVersion();
-                if (null != version) {
+                var users = await client.Users.SearchAsync("kloub");
+                if (null != users) {
                     
                 }
             }
