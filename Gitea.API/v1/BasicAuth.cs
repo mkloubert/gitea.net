@@ -1,4 +1,4 @@
-﻿// The MIT License (MIT)
+// The MIT License (MIT)
 //
 // gitea.net (https://github.com/mkloubert/gitea.net)
 // Copyright (c) Marcel Joachim Kloubert <marcel.kloubert@gmx.net>
@@ -33,8 +33,7 @@ namespace Gitea.API.v1
     public class BasicAuth : IAuthorizer
     {
         /// <inheritdoc />
-        public void PrepareClient(HttpClient client)
-        {
+        public void PrepareClient(HttpClient client) {
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue
                 (
                     "Basic",

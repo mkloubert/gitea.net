@@ -1,4 +1,4 @@
-﻿// The MIT License (MIT)
+// The MIT License (MIT)
 //
 // gitea.net (https://github.com/mkloubert/gitea.net)
 // Copyright (c) Marcel Joachim Kloubert <marcel.kloubert@gmx.net>
@@ -20,17 +20,16 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 
+using System;
 using System.Net.Http;
 
-namespace Gitea.API.v1
-{
+namespace Gitea.API.v1 {
     /// <summary>
-    /// Describes an API authorizer.
+    /// Prepares an HTTP client for authorization.
     /// </summary>
-    public interface IAuthorizer
-    {
+    public interface IAuthorizer {
         /// <summary>
-        /// Prepares a HTTP client.
+        /// Prepares a client.
         /// </summary>
         /// <param name="client">The client to prepare.</param>
         void PrepareClient(HttpClient client);
