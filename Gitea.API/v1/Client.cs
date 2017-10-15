@@ -21,10 +21,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Gitea.API.Extensions;
 using Gitea.API.v1.Users;
 using Newtonsoft.Json;
 
@@ -94,17 +96,16 @@ namespace Gitea.API.v1 {
             }
 
             HttpClient newClient;
-            if (msgHandler == null)
-            {
+            if (null == msgHandler) {
                 newClient = new HttpClient();
             }
-            else
-            {
+            else {
                 newClient = new HttpClient(msgHandler);  // use custom handler
             }
 
             newClient.BaseAddress = BaseUrl;
-            newClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            newClient.DefaultRequestHeaders.Accept
+                                           .Add(new MediaTypeWithQualityHeaderValue("application/json"));
             Authorizer.PrepareClient(newClient);
 
             return newClient;
@@ -124,11 +125,10 @@ namespace Gitea.API.v1 {
             using (var rest = CreateBaseClient()) {
                 var resp = await rest.GetAsync("version");
 
-                var version = JsonConvert.DeserializeObject<GiteaVersion>
-                    (
-                        await resp.Content.ReadAsStringAsync()
-                    );
-                version.Client = this;
+                var version = await resp.Content.DeserializeAsync<GiteaVersion>();
+                if (version != null) {
+                    version.Client = this;
+                }
 
                 return version;
             }
@@ -165,6 +165,23 @@ namespace Gitea.API.v1 {
         /// </summary>
         protected virtual void SetupEndpoints() {
             Users = new UserEndpoint(this);
+        }
+
+        internal void SetupForMe(IEnumerable<User> users) {
+            if (users == null) {
+                return;
+            }
+
+            using (var e = users.GetEnumerator()) {
+                while (e.MoveNext()) {
+                    var u = e.Current;
+                    if (u == null) {
+                        continue;
+                    }
+
+                    u.Client = this;
+                }
+            }
         }
 
         /// <summary>

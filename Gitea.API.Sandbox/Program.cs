@@ -1,6 +1,9 @@
 ﻿using Gitea.API.v1;
+using Gitea.API.v1.Users;
 using System;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Gitea.API.Sandbox {
     class Program {
@@ -24,10 +27,8 @@ namespace Gitea.API.Sandbox {
 
             using (var client = new Client(auth,
                                            Credentials.Host, Credentials.Port, Credentials.IsSecure)) {
-                var users = await client.Users.SearchAsync("kloub");
-                if (null != users) {
-                    
-                }
+                var user = await client.Users.GetCurrentAsync();
+                var following = await user.GetFollowingAsync<Collection<User>>();
             }
         }
     }

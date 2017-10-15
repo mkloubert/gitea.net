@@ -22,6 +22,11 @@
 
 using Newtonsoft.Json;
 using System.Runtime.Serialization;
+using System.Collections.Generic;
+using System;
+using Gitea.API.Extensions;
+using System.Threading.Tasks;
+using System.Web;
 
 namespace Gitea.API.v1.Users {
     /// <summary>
@@ -43,6 +48,12 @@ namespace Gitea.API.v1.Users {
         public string AvatarUrl { get; set; }
 
         /// <summary>
+        /// Gets the underlying client.
+        /// </summary>
+        /// <returns></returns>
+        public Client Client { get; internal set; }
+
+        /// <summary>
         /// email
         /// </summary>
         [DataMember]
@@ -55,6 +66,130 @@ namespace Gitea.API.v1.Users {
         [DataMember]
         [JsonProperty("full_name")]
         public string FullName { get; set; }
+
+        /// <summary>
+        /// Returns the list of followers.
+        /// </summary>
+        /// <returns>The list of followers.</returns>
+        public async Task<List<User>> GetFollowersAsync() {
+            return await GetFollowersAsync<List<User>>();
+        }
+
+        /// <summary>
+        /// Returns the collection of followers.
+        /// </summary>
+        /// <typeparam name="TCollection">Type of the collection to return.</typeparam>
+        /// <returns>The collection of followers.</returns>
+        public async Task<TCollection> GetFollowersAsync<TCollection>()
+            where TCollection : global::System.Collections.Generic.ICollection<User>, new()
+        {
+            using (var rest = Client.CreateBaseClient()) {
+                var resp = await rest.GetAsync("users/" + HttpUtility.UrlEncode(Username) + "/followers");
+
+                Exception ex = null;
+
+                switch ((int)resp.StatusCode) {
+                    case 200:
+                        break;
+
+                    case 500:
+                        ex = await ApiException.FromResponseAsync(resp);
+                        break;
+
+                    default:
+                        ex = await UnexpectedResponseException.FromResponseAsync(resp);
+                        break;
+                }
+
+                if (ex != null) {
+                    throw ex;
+                }
+
+                IEnumerable<User> answer = await resp.Content.DeserializeAsync<List<User>>();
+
+                if (answer is TCollection) {
+                    return (TCollection)answer;
+                }
+                
+                var users = default(TCollection);
+
+                if (answer != null) {
+                    users = new TCollection();
+                    
+                    using (var e = answer.GetEnumerator()) {
+                        while (e.MoveNext()) {
+                            users.Add(e.Current);
+                        }
+                    }
+                }
+
+                Client.SetupForMe(users);
+
+                return users;
+            }
+        }
+
+        /// <summary>
+        /// Returns the list of users that user is following.
+        /// </summary>
+        /// <returns>The list of followers.</returns>
+        public async Task<List<User>> GetFollowingAsync() {
+            return await GetFollowingAsync<List<User>>();
+        }
+
+        /// <summary>
+        /// Returns the collection of users that user is following.
+        /// </summary>
+        /// <typeparam name="TCollection">Type of the collection to return.</typeparam>
+        /// <returns>The collection of followers.</returns>
+        public async Task<TCollection> GetFollowingAsync<TCollection>()
+            where TCollection : global::System.Collections.Generic.ICollection<User>, new()
+        {
+            using (var rest = Client.CreateBaseClient()) {
+                var resp = await rest.GetAsync("users/" + HttpUtility.UrlEncode(Username) + "/following");
+
+                Exception ex = null;
+
+                switch ((int)resp.StatusCode) {
+                    case 200:
+                        break;
+
+                    case 500:
+                        ex = await ApiException.FromResponseAsync(resp);
+                        break;
+
+                    default:
+                        ex = await UnexpectedResponseException.FromResponseAsync(resp);
+                        break;
+                }
+
+                if (ex != null) {
+                    throw ex;
+                }
+
+                IEnumerable<User> answer = await resp.Content.DeserializeAsync<List<User>>();
+
+                if (answer is TCollection) {
+                    return (TCollection)answer;
+                }
+                
+                var users = default(TCollection);
+
+                if (answer != null) {
+                    users = new TCollection();
+                    
+                    using (var e = answer.GetEnumerator()) {
+                        while (e.MoveNext()) {
+                            users.Add(e.Current);
+                        }
+                    }
+                }
+
+                Client.SetupForMe(users);
+
+                return users;
+            }
+        }
 
         /// <summary>
         /// id
