@@ -118,7 +118,10 @@ namespace Gitea.API.v1.Users
         {
             return new MigrationBuilder(User);
         }
-
+        public RepositoryBuilder Create()
+        {
+            return new RepositoryBuilder(User);
+        }
         /// <summary>
         /// Gets the underlying user.
         /// </summary>
