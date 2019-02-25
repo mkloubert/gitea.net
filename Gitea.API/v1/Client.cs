@@ -138,8 +138,11 @@ namespace Gitea.API.v1
             }
 
             newClient.BaseAddress = BaseUrl;
-            newClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            
+            // I found that if the Authentication header was not first, the API would not except the request.
             Authorizer.PrepareClient(newClient);
+            newClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            
 
             return newClient;
         }

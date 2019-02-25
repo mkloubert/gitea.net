@@ -41,6 +41,8 @@ namespace Gitea.API.v1.Repositories
         /// Stores the properties for the request.
         /// </summary>
         protected IDictionary<string, object> _properties = new Dictionary<string, object>();
+        string _ownerName;
+        bool _isOrg = false;
 
         public RepositoryBuilder(User user)
         {
@@ -115,6 +117,14 @@ namespace Gitea.API.v1.Repositories
 
             return this;
         }
+
+        public RepositoryBuilder Owner(string name, bool isOrganization)
+        {
+            _ownerName = name;
+            _isOrg = isOrganization;
+
+            return this;
+        }
         
         /// <summary>
         /// Starts migration.
@@ -125,7 +135,7 @@ namespace Gitea.API.v1.Repositories
             using (var rest = User.Endpoint.Client.CreateBaseClient())
             {
                 var resp = await rest.PostAsync(
-                    "user/repos",
+                    _isOrg ? $"org/{_ownerName}/repos" : "user/repos",
                     new StringContent(ToJson(), Encoding.UTF8, "application/json")
                 );
 
