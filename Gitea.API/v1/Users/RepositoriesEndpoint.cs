@@ -106,8 +106,37 @@ namespace Gitea.API.v1.Users
                     }
                 }
 
+                resp = await rest.GetAsync("user/orgs");
+                var orgs = JsonConvert.DeserializeObject<IEnumerable<User>>(await resp.Content.ReadAsStringAsync());
+                foreach (User org in orgs)
+                {
+                    resp = await rest.GetAsync($"orgs/{org.Username}/repos");
+                    repoList = JsonConvert.DeserializeObject<IEnumerable<Repository>>
+                    (
+                        await resp.Content.ReadAsStringAsync()
+                    );
+                    foreach (Repository repository in repoList)
+                    {
+                        repository.Owner.Endpoint = User.Endpoint;
+                        userRepos.Add(repository);
+                    }
+
+                }
+
                 return userRepos;
             }
+        }
+        
+        public async Task<User[]> GetUserOrginizationsAsync()
+        {
+            
+            using (var rest = User.Endpoint.Client.CreateBaseClient())
+            {
+                var resp = await rest.GetAsync("user/orgs");
+                var orgsJson = JsonConvert.DeserializeObject<List<User>>(await resp.Content.ReadAsStringAsync());
+                return orgsJson.ToArray();
+            }
+            
         }
 
         /// <summary>
