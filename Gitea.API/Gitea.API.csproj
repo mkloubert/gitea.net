@@ -10,11 +10,10 @@
     <Company>mkloubert</Company>
     <PackageProjectUrl>https://github.com/mkloubert/gitea.net</PackageProjectUrl>
     <RepositoryUrl>https://github.com/mkloubert/gitea.net</RepositoryUrl>
-    <PackageTags>itea</PackageTags>
+    <PackageTags>Gitea;Git</PackageTags>
     <PackageLicenseUrl>https://raw.githubusercontent.com/maikebing/gitea.net/master/LICENSE</PackageLicenseUrl>
     <Version>1.0.1</Version>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
   </ItemGroup>
@@ -22,9 +21,7 @@
     <Reference Include="System.Web" />
     <Reference Include="System.Net.Http" />
   </ItemGroup>
-
   <ItemGroup>
     <Folder Include="Properties\" />
   </ItemGroup>
-
 </Project>
