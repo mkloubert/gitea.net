@@ -12,6 +12,7 @@
     <RepositoryUrl>https://github.com/mkloubert/gitea.net</RepositoryUrl>
     <PackageTags>itea</PackageTags>
     <PackageLicenseUrl>https://raw.githubusercontent.com/maikebing/gitea.net/master/LICENSE</PackageLicenseUrl>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
