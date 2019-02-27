@@ -52,7 +52,7 @@ namespace Gitea.API.v1
         /// <inheritdoc />
         public override string Message
         {
-            get { return string.Format("Unexpected response: [{0}] '{1}'"); }
+            get { return $"Unexpected response: [{Code}] '{Status}'"; }
         }
 
         /// <summary>
