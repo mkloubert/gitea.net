@@ -13,20 +13,8 @@ namespace Gitea.API.v1.Releases
     public sealed class ReleaseBuilder
     {
         private readonly Repository _repository;
-        private readonly User _user;
         protected readonly IDictionary<string, object> _properties = new Dictionary<string, object>();
-        private string _body;
-        private bool _draft;
-        private string _name;
-        private bool _prerelease;
-        private string _tagName;
-        private string _targetCommitish;
-        private string _ownerName;
-        private string _reposName;
-        /*internal ReleaseBuilder(User user)
-        {
-            _user = user;
-        }*/
+     
         internal ReleaseBuilder(Repository repository)
         {
             _repository = repository;
@@ -35,42 +23,36 @@ namespace Gitea.API.v1.Releases
         public ReleaseBuilder SetBody(string body)
         {
             _properties["body"] = body;
-            _body = body;
             return this;
         }
 
         public ReleaseBuilder SetDraft(bool draft)
         {
             _properties["draft"] = draft;
-            _draft = draft;
             return this;
         }
 
         public ReleaseBuilder SetName(string name)
         {
             _properties["name"] = name;
-            _name = name;
             return this;
         }
 
         public ReleaseBuilder SetPrerelease(bool isPrerelease)
         {
             _properties["prerelease"] = isPrerelease;
-            _prerelease = isPrerelease;
             return this;
         }
 
         public ReleaseBuilder SetTagName(string tagName)
         {
             _properties["tag_name"] = tagName;
-            _tagName = tagName;
             return this;
         }
 
         public ReleaseBuilder SetTargetCommitish(string targetCommitish)
         {
             _properties["target_commitish"] = targetCommitish;
-            _targetCommitish = targetCommitish;
             return this;
         }
         
