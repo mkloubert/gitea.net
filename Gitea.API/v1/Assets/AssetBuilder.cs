@@ -107,8 +107,7 @@ namespace Gitea.API.v1.Assets
                 (
                     await resp.Content.ReadAsStringAsync()
                 );
-
-                //TODO: why?
+                
                 if (asset != null)
                 {
                     asset.Release = _release;
