@@ -35,6 +35,12 @@ namespace Gitea.API.v1.Repositories
     {
         protected RepositoryPermissions _permissions;
 
+
+        public Repository()
+        {
+            Releases = new ReleasesEndpoint(this);
+        }
+
         /// <summary>
         /// clone_url
         /// </summary>
@@ -219,5 +225,11 @@ namespace Gitea.API.v1.Repositories
         [DataMember]
         [JsonProperty("website")]
         public string Website { get; set; }
+        
+        
+        /// <summary>
+        /// Gets the underlying endpoint of repositories of that user.
+        /// </summary>
+        public ReleasesEndpoint Releases { get; internal protected set; }
     }
 }
